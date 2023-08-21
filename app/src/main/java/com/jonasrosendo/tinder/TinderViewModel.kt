@@ -11,7 +11,7 @@ import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.storage.FirebaseStorage
 import com.jonasrosendo.tinder.data.COLLECTION_USER
 import com.jonasrosendo.tinder.data.Event
-import com.jonasrosendo.tinder.data.FirebaseUserData
+import com.jonasrosendo.tinder.model.FirebaseUserData
 import com.jonasrosendo.tinder.ui.screens.Gender
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

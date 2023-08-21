@@ -1,4 +1,4 @@
-package com.jonasrosendo.tinder.data
+package com.jonasrosendo.tinder.model
 
 data class FirebaseUserData(
     val userId: String? = "",

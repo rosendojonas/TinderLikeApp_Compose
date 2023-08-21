@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jonasrosendo.tinder.TinderViewModel
-import com.jonasrosendo.tinder.data.FirebaseUserData
+import com.jonasrosendo.tinder.model.FirebaseUserData
 import com.jonasrosendo.tinder.navigation.RouteNavigation
 import com.jonasrosendo.tinder.navigation.navigateTo
 import com.jonasrosendo.tinder.navigation.navigateToAndClearStack
