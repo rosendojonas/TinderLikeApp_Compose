@@ -39,81 +39,11 @@ class TinderViewModel @Inject constructor(
     val userData: StateFlow<FirebaseUserData?> = _userData
 
     init {
-        //auth.signOut()
         val currentUser = auth.currentUser
         _signedIn.value = currentUser != null
         currentUser?.uid?.let { uid ->
             retrieveUserData(uid)
         }
-    }
-
-    fun onLogin(email: String, password: String) {
-        if (email.isEmpty() or password.isEmpty()) {
-            handleException(customMessage = "Please fill in all fields!")
-            return
-        }
-
-        showLoading()
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    _signedIn.value = true
-                    hideLoading()
-                    auth.currentUser?.uid?.let {
-                        retrieveUserData(it)
-                    }
-                } else {
-                    handleException(task.exception, customMessage = "Login failed.")
-                }
-            }
-            .addOnFailureListener {
-                handleException(it, customMessage = "Login failed.")
-            }
-    }
-
-    fun onSignup(username: String, email: String, password: String) {
-        if (username.isEmpty() or email.isEmpty() or password.isEmpty()) {
-            handleException(customMessage = "Please fill in all fields!")
-            return
-        }
-
-        showLoading()
-
-        signupUser(email = email, password = password, username = username)
-    }
-
-    private fun signupUser(email: String, password: String, username: String) {
-        getUserByUsername(username)
-            .addOnSuccessListener { snapshot ->
-                if (snapshot.isEmpty) {
-                    createAccount(
-                        email = email,
-                        password = password,
-                        username = username
-                    )
-                } else {
-                    handleException(customMessage = "Username already exists")
-                }
-
-                hideLoading()
-
-            }.addOnFailureListener { exception ->
-                handleException(exception)
-            }
-    }
-
-    private fun createAccount(email: String, password: String, username: String) {
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // create user profile in database
-                    createOrUpdateProfile(
-                        username = username
-                    )
-                } else {
-                    handleException(task.exception, "Signup failed")
-                }
-            }
     }
 
     private fun retrieveUserData(uid: String) {
@@ -133,22 +63,9 @@ class TinderViewModel @Inject constructor(
             }
     }
 
-    fun onLogout() {
-        auth.logout()
-        _signedIn.value = false
-        _userData.value = null
-        _popupNotification.value = Event("Logged out.")
-    }
-
     private fun getFirebaseUserById(uid: String): DocumentReference {
         return fireStore.collection(COLLECTION_USER)
             .document(uid)
-    }
-
-    private fun getUserByUsername(username: String): Task<QuerySnapshot> {
-        return fireStore.collection(COLLECTION_USER)
-            .whereEqualTo("username", username)
-            .get()
     }
 
     private fun showLoading() {
@@ -157,54 +74,6 @@ class TinderViewModel @Inject constructor(
 
     private fun hideLoading() {
         _loading.value = false
-    }
-
-    private fun createOrUpdateProfile(
-        name: String? = null,
-        username: String? = null,
-        imageUrl: String? = null,
-        bio: String? = null,
-        gender: Gender? = null,
-        genderPreference: Gender? = null
-    ) {
-        val uid = auth.currentUser?.uid
-
-        val userData = FirebaseUserData(
-            userId = uid,
-            name = name ?: _userData.value?.name,
-            username = username ?: _userData.value?.username,
-            imageUrl = imageUrl ?: _userData.value?.imageUrl,
-            bio = bio ?: _userData.value?.bio,
-            gender = gender?.toString() ?: _userData.value?.gender,
-            genderPreference = genderPreference?.toString() ?: _userData.value?.genderPreference
-        )
-
-        uid?.let { userId ->
-            showLoading()
-            fireStore.collection(COLLECTION_USER)
-                .document(userId)
-                .get()
-                .addOnSuccessListener { snapshot ->
-                    if (snapshot.exists()) {
-                        snapshot.reference.update(userData.toMap())
-                            .addOnSuccessListener {
-                                hideLoading()
-                            }
-                            .addOnFailureListener { exception ->
-                                handleException(exception, "Cannot update user!")
-                            }
-                    } else {
-                        fireStore.collection(COLLECTION_USER)
-                            .document(userId)
-                            .set(userData)
-                        hideLoading()
-                        retrieveUserData(userId)
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    handleException(exception, "Cannot create user!")
-                }
-        }
     }
 
     private fun handleException(

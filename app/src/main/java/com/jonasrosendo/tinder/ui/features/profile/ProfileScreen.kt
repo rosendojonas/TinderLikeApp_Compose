@@ -118,20 +118,21 @@ fun ProfileScreen(navController: NavController) {
                     onGenderChange = { genderState.value = it },
                     onGenderPreferenceChange = { genderPreferenceState.value = it },
                     onSave = {
-                        //call from view model
-                        viewModel.save(
-                            name = nameState.value,
-                            username = usernameState.value,
-                            bio = bioState.value,
-                            gender = genderState.value,
-                            genderPreference = genderPreferenceState.value
+                        viewModel.applyAction(
+                            ProfileViewAction.SaveProfile(
+                                name = nameState.value,
+                                username = usernameState.value,
+                                bio = bioState.value,
+                                gender = genderState.value,
+                                genderPreference = genderPreferenceState.value
+                            )
                         )
                     },
                     onBack = {
                         navController.navigateTo(RouteNavigation.Swipe.route)
                     }
                 ) {
-                    viewModel.logout()
+                    viewModel.applyAction(ProfileViewAction.SignOut)
                     navController.navigateToAndClearStack(RouteNavigation.Login.route)
                 }
                 BottomNavigationMenu(
@@ -184,15 +185,7 @@ private fun ProfileContent(
         modifier = modifier
     ) {
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = stringResource(R.string.back), modifier = Modifier.clickable { onBack() })
-            Text(text = stringResource(R.string.save), modifier = Modifier.clickable { onSave() })
-        }
+        TopBar(onBack, onSave)
 
         CommonDivider()
 
@@ -218,127 +211,161 @@ private fun ProfileContent(
             isSingleLine = false
         )
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(4.dp),
-            verticalAlignment = Alignment.Top
-        ) {
-            Text(
-                text = stringResource(R.string.i_am_a), modifier = Modifier
-                    .width(100.dp)
-                    .padding(8.dp)
-            )
-
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    RadioButton(
-                        selected = gender.value == Gender.MALE,
-                        onClick = {
-                            onGenderChange(Gender.MALE)
-                        }
-                    )
-                    Text(
-                        text = stringResource(R.string.man),
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .clickable { onGenderChange(Gender.MALE) }
-                    )
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    RadioButton(
-                        selected = gender.value == Gender.FEMALE,
-                        onClick = {
-                            onGenderChange(Gender.FEMALE)
-                        }
-                    )
-                    Text(
-                        text = stringResource(R.string.woman),
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .clickable { onGenderChange(Gender.FEMALE) }
-                    )
-                }
-            }
-
-        }
+        GenderRadioButtonSection(gender, onGenderChange)
 
         CommonDivider()
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(4.dp),
-            verticalAlignment = Alignment.Top
-        ) {
-            Text(
-                text = stringResource(R.string.looking_for), modifier = Modifier
-                    .width(100.dp)
-                    .padding(8.dp)
-            )
-
-            Column(modifier = Modifier.fillMaxWidth()) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    RadioButton(
-                        selected = genderPreference.value == Gender.MALE,
-                        onClick = {
-                            onGenderPreferenceChange(Gender.MALE)
-                        }
-                    )
-                    Text(
-                        text = stringResource(R.string.men),
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .clickable { onGenderPreferenceChange(Gender.MALE) }
-                    )
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    RadioButton(
-                        selected = genderPreference.value == Gender.FEMALE,
-                        onClick = {
-                            onGenderPreferenceChange(Gender.FEMALE)
-                        }
-                    )
-                    Text(
-                        text = stringResource(R.string.women),
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .clickable { onGenderPreferenceChange(Gender.FEMALE) }
-                    )
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-
-                    RadioButton(
-                        selected = genderPreference.value == Gender.BOTH,
-                        onClick = {
-                            onGenderPreferenceChange(Gender.BOTH)
-                        }
-                    )
-
-                    Text(
-                        text = stringResource(R.string.both),
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .clickable { onGenderPreferenceChange(Gender.BOTH) }
-                    )
-                }
-            }
-        }
+        GenderPreferenceRadioButtonSection(genderPreference, onGenderPreferenceChange)
 
         CommonDivider()
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.logout),
-                modifier = Modifier.clickable { onLogout() })
+        LogoutButton(onLogout)
+    }
+}
+
+@Composable
+private fun TopBar(onBack: () -> Unit, onSave: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = stringResource(R.string.back), modifier = Modifier.clickable { onBack() })
+        Text(text = stringResource(R.string.save), modifier = Modifier.clickable { onSave() })
+    }
+}
+
+@Composable
+private fun GenderRadioButtonSection(
+    gender: MutableState<Gender>,
+    onGenderChange: (Gender) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Text(
+            text = stringResource(R.string.i_am_a), modifier = Modifier
+                .width(100.dp)
+                .padding(8.dp)
+        )
+
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(
+                    selected = gender.value == Gender.MALE,
+                    onClick = {
+                        onGenderChange(Gender.MALE)
+                    }
+                )
+                Text(
+                    text = stringResource(R.string.man),
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clickable { onGenderChange(Gender.MALE) }
+                )
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(
+                    selected = gender.value == Gender.FEMALE,
+                    onClick = {
+                        onGenderChange(Gender.FEMALE)
+                    }
+                )
+                Text(
+                    text = stringResource(R.string.woman),
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clickable { onGenderChange(Gender.FEMALE) }
+                )
+            }
         }
+
+    }
+}
+
+@Composable
+private fun GenderPreferenceRadioButtonSection(
+    genderPreference: MutableState<Gender>,
+    onGenderPreferenceChange: (Gender) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Text(
+            text = stringResource(R.string.looking_for), modifier = Modifier
+                .width(100.dp)
+                .padding(8.dp)
+        )
+
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(
+                    selected = genderPreference.value == Gender.MALE,
+                    onClick = {
+                        onGenderPreferenceChange(Gender.MALE)
+                    }
+                )
+                Text(
+                    text = stringResource(R.string.men),
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clickable { onGenderPreferenceChange(Gender.MALE) }
+                )
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(
+                    selected = genderPreference.value == Gender.FEMALE,
+                    onClick = {
+                        onGenderPreferenceChange(Gender.FEMALE)
+                    }
+                )
+                Text(
+                    text = stringResource(R.string.women),
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clickable { onGenderPreferenceChange(Gender.FEMALE) }
+                )
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+
+                RadioButton(
+                    selected = genderPreference.value == Gender.BOTH,
+                    onClick = {
+                        onGenderPreferenceChange(Gender.BOTH)
+                    }
+                )
+
+                Text(
+                    text = stringResource(R.string.both),
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .clickable { onGenderPreferenceChange(Gender.BOTH) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun LogoutButton(onLogout: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.logout),
+            modifier = Modifier.clickable { onLogout() })
     }
 }
 
@@ -380,7 +407,7 @@ fun ProfileImage(
     ) { uri: Uri? ->
 
         uri?.let {
-            viewModel.uploadProfileImage(uri)
+            viewModel.applyAction(ProfileViewAction.UploadProfileImage(uri))
         }
     }
     Box(

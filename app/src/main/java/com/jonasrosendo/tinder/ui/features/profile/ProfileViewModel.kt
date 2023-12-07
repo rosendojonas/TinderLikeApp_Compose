@@ -32,9 +32,6 @@ class ProfileViewModel @Inject constructor(
     private val _popupNotification = MutableStateFlow<Event<String>?>(null)
     val popupNotification: StateFlow<Event<String>?> = _popupNotification
 
-    private val _signedIn = MutableStateFlow(false)
-    val signedIn: StateFlow<Boolean> = _signedIn
-
     private val _userData = MutableStateFlow<FirebaseUserData?>(null)
     val userData: StateFlow<FirebaseUserData?> = _userData
 
@@ -44,10 +41,14 @@ class ProfileViewModel @Inject constructor(
     override fun processAction(action: ProfileViewAction) {
         when (action) {
             is ProfileViewAction.SignOut -> logout()
+
             ProfileViewAction.GetUserData -> getUserData()
+
             is ProfileViewAction.SaveProfile -> saveProfile(
                 action.name, action.username, action.bio, action.gender, action.genderPreference
             )
+
+            is ProfileViewAction.UploadProfileImage -> uploadProfileImage(uri = action.uri)
         }
     }
 
@@ -132,13 +133,13 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun uploadProfileImage(uri: Uri) {
+    private fun uploadProfileImage(uri: Uri) {
         uploadImage(uri) {
             updateProfile(imageUrl = it.toString())
         }
     }
 
-    fun save(
+    private fun save(
         name: String,
         username: String,
         bio: String,
@@ -180,9 +181,8 @@ class ProfileViewModel @Inject constructor(
         _popupNotification.value = Event(message)
     }
 
-    fun logout() {
+    private fun logout() {
         auth.logout()
-        _signedIn.value = false
         _userData.value = null
         _popupNotification.value = Event("Logged out.")
     }

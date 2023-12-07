@@ -1,5 +1,7 @@
 package com.jonasrosendo.tinder.ui.features.profile
 
+import android.net.Uri
+
 sealed class ProfileViewAction {
     object SignOut : ProfileViewAction()
     object GetUserData : ProfileViewAction()
@@ -10,4 +12,6 @@ sealed class ProfileViewAction {
         val gender: Gender,
         val genderPreference: Gender
     ) : ProfileViewAction()
+
+    data class UploadProfileImage(val uri: Uri) : ProfileViewAction()
 }
