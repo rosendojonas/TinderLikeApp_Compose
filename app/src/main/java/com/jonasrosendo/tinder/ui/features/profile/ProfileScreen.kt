@@ -1,16 +1,23 @@
 package com.jonasrosendo.tinder.ui.features.profile
 
-import androidx.compose.foundation.background
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Card
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
@@ -32,16 +39,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.jonasrosendo.tinder.R
-import com.jonasrosendo.tinder.model.FirebaseUserData
 import com.jonasrosendo.tinder.navigation.RouteNavigation
 import com.jonasrosendo.tinder.navigation.navigateTo
 import com.jonasrosendo.tinder.navigation.navigateToAndClearStack
 import com.jonasrosendo.tinder.shared_ui.ShowToast
 import com.jonasrosendo.tinder.ui.BottomNavigationItem
 import com.jonasrosendo.tinder.ui.BottomNavigationMenu
-import com.jonasrosendo.tinder.ui.features.login.LoginViewEvent
 import com.jonasrosendo.tinder.ui.features.profile.ProfileViewState.DataRetrieved
 import com.jonasrosendo.tinder.utils.CommonDivider
+import com.jonasrosendo.tinder.utils.CommonImage
 import com.jonasrosendo.tinder.utils.CommonProgressSpinner
 
 enum class Gender {
@@ -83,9 +89,16 @@ fun ProfileScreen(navController: NavController) {
             nameState.value = userData.value?.name ?: ""
             usernameState.value = userData.value?.username ?: ""
             bioState.value = userData.value?.bio ?: ""
-            genderState.value = Gender.valueOf(userData.value?.gender ?: stringResource(R.string.male))
+            genderState.value =
+                Gender.valueOf(
+                    if (userData.value == null) stringResource(R.string.male)
+                    else userData.value!!.gender.toString().uppercase()
+                )
             genderPreferenceState.value =
-                Gender.valueOf(userData.value?.genderPreference ?: stringResource(R.string.female))
+                Gender.valueOf(
+                    if (userData.value == null) stringResource(R.string.female)
+                    else userData.value!!.genderPreference.toString().uppercase()
+                )
 
             Column {
                 ProfileContent(
@@ -183,7 +196,7 @@ private fun ProfileContent(
 
         CommonDivider()
 
-        ProfileImage()
+        ProfileImage(imageUri = imageUrl, viewModel)
 
         CommonDivider()
 
@@ -201,11 +214,8 @@ private fun ProfileContent(
             label = stringResource(R.string.bio),
             textFieldValue = bio,
             onValueChange = onBioChange,
-            modifier = Modifier
-                .background(
-                    color = Color.Transparent
-                )
-                .height(150.dp)
+            modifier = Modifier.height(150.dp),
+            isSingleLine = false
         )
 
         Row(
@@ -325,21 +335,23 @@ private fun ProfileContent(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(text = stringResource(R.string.logout), modifier = Modifier.clickable { onLogout() })
+            Text(
+                text = stringResource(R.string.logout),
+                modifier = Modifier.clickable { onLogout() })
         }
     }
 }
 
 @Composable
 fun ProfileTextBox(
-    modifier: Modifier? = Modifier,
+    modifier: Modifier = Modifier,
     label: String,
     textFieldValue: MutableState<String>,
     onValueChange: (String) -> Unit,
     isSingleLine: Boolean = true,
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(4.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -348,16 +360,56 @@ fun ProfileTextBox(
         TextField(
             value = textFieldValue.value,
             onValueChange = onValueChange,
-            modifier = modifier ?: Modifier.background(
-                color = Color.Transparent
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = Color.Black,
+                backgroundColor = Color.Transparent
             ),
-            colors = TextFieldDefaults.textFieldColors(textColor = Color.Black),
             singleLine = isSingleLine
         )
     }
 }
 
 @Composable
-fun ProfileImage() {
+fun ProfileImage(
+    imageUri: String?,
+    viewModel: ProfileViewModel
+) {
 
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+
+        uri?.let {
+            viewModel.uploadProfileImage(uri)
+        }
+    }
+    Box(
+        modifier = Modifier
+            .height(intrinsicSize = IntrinsicSize.Min),
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+                .clickable {
+                    // open image gallery
+                    launcher.launch("image/*")
+                },
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Card(
+                shape = CircleShape,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .size(100.dp)
+            ) {
+                CommonImage(data = imageUri)
+            }
+
+            Text(text = "Change profile picture")
+        }
+
+        val isLoading = false
+        if (isLoading) CommonProgressSpinner()
+    }
 }

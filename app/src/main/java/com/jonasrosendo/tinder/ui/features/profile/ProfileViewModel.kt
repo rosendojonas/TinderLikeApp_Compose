@@ -1,5 +1,6 @@
 package com.jonasrosendo.tinder.ui.features.profile
 
+import android.net.Uri
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -16,6 +17,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.util.UUID
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -111,6 +113,28 @@ class ProfileViewModel @Inject constructor(
                 .addOnFailureListener { exception ->
                     handleException(exception, "Cannot create user!")
                 }
+        }
+    }
+
+    private fun uploadImage(uri: Uri, onSuccess: (Uri) -> Unit) {
+        val storageRef = storage.reference
+        val uuid = UUID.randomUUID()
+        val imageRef = storageRef.child("images/$uuid")
+        val uploadTask = imageRef.putFile(uri)
+
+        uploadTask.addOnSuccessListener {
+
+            val result = it.metadata?.reference?.downloadUrl
+
+            result?.addOnSuccessListener(onSuccess)
+        }.addOnFailureListener {
+            handleException(it)
+        }
+    }
+
+    fun uploadProfileImage(uri: Uri) {
+        uploadImage(uri) {
+            updateProfile(imageUrl = it.toString())
         }
     }
 
