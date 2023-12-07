@@ -1,6 +1,5 @@
 package com.jonasrosendo.tinder.ui.features.login
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -22,9 +21,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -78,7 +78,7 @@ fun LoginScreen(
         viewModel.signedIn.collect {
             isLogged.value = it
         }
-     }
+    }
 
     if (isLogged.value) {
         navController.navigateToAndClearStack(RouteNavigation.Swipe.route)
@@ -135,6 +135,7 @@ fun DefaultState(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             Image(
                 painter = painterResource(
                     id = R.drawable.fire
@@ -147,7 +148,7 @@ fun DefaultState(
             )
 
             Text(
-                text = "Login",
+                text = stringResource(R.string.login),
                 modifier = Modifier
                     .padding(8.dp),
                 fontSize = 30.sp,
@@ -159,7 +160,7 @@ fun DefaultState(
                 onValueChange = onEmailChange,
                 modifier = Modifier
                     .padding(8.dp),
-                label = { Text(text = "E-mail") }
+                label = { Text(text = stringResource(R.string.e_mail)) }
             )
 
             OutlinedTextField(
@@ -167,11 +168,12 @@ fun DefaultState(
                 onValueChange = onPasswordChange,
                 modifier = Modifier
                     .padding(8.dp),
-                label = { Text(text = "Password") }
+                label = { Text(text = stringResource(R.string.password)) },
+                visualTransformation = PasswordVisualTransformation()
             )
 
             AuthenticationButton(
-                label = "LOGIN"
+                label = stringResource(R.string.login).uppercase()
             ) {
                 viewModel.login(
                     email.trim(),
@@ -180,7 +182,7 @@ fun DefaultState(
             }
 
             Text(
-                text = "Don't have an account? Go to signup ->",
+                text = stringResource(R.string.don_t_have_an_account_go_to_signup),
                 color = Color.Blue,
                 modifier = Modifier
                     .padding(8.dp)

@@ -17,4 +17,8 @@
     <string name="logout">Logout</string>
     <string name="male">MALE</string>
     <string name="female">FEMALE</string>
+    <string name="login">Login</string>
+    <string name="e_mail">E-mail</string>
+    <string name="password">Password</string>
+    <string name="don_t_have_an_account_go_to_signup"><![CDATA[Don\'t have an account? Go to signup ->]]></string>
 </resources>
