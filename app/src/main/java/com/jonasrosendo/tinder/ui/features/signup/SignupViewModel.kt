@@ -1,17 +1,15 @@
-package com.jonasrosendo.tinder
+package com.jonasrosendo.tinder.ui.features.signup
 
 import android.util.Log
-import androidx.lifecycle.ViewModel
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.storage.FirebaseStorage
+import com.jonasrosendo.tinder.core.BaseViewModel
 import com.jonasrosendo.tinder.data.COLLECTION_USER
 import com.jonasrosendo.tinder.data.Event
-import com.jonasrosendo.tinder.data.FirebaseHelper.logout
+import com.jonasrosendo.tinder.data.FirebaseHelper.getFirebaseUserById
+import com.jonasrosendo.tinder.data.FirebaseHelper.getUserByUsername
 import com.jonasrosendo.tinder.model.FirebaseUserData
 import com.jonasrosendo.tinder.ui.features.profile.Gender
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,11 +18,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @HiltViewModel
-class TinderViewModel @Inject constructor(
+class SignupViewModel @Inject constructor(
     val auth: FirebaseAuth,
     val fireStore: FirebaseFirestore,
     val storage: FirebaseStorage
-) : ViewModel() {
+) : BaseViewModel<SignupViewState, SignupViewEvent, SignupViewAction>() {
 
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
@@ -38,40 +36,16 @@ class TinderViewModel @Inject constructor(
     private val _userData = MutableStateFlow<FirebaseUserData?>(null)
     val userData: StateFlow<FirebaseUserData?> = _userData
 
-    init {
-        //auth.signOut()
-        val currentUser = auth.currentUser
-        _signedIn.value = currentUser != null
-        currentUser?.uid?.let { uid ->
-            retrieveUserData(uid)
+    override val initialViewState: SignupViewState
+        get() = SignupViewState.Default
+
+    override fun processAction(action: SignupViewAction) {
+        when (action) {
+            is SignupViewAction.Signup -> signup(action.username, action.email, action.password)
         }
     }
 
-    fun onLogin(email: String, password: String) {
-        if (email.isEmpty() or password.isEmpty()) {
-            handleException(customMessage = "Please fill in all fields!")
-            return
-        }
-
-        showLoading()
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    _signedIn.value = true
-                    hideLoading()
-                    auth.currentUser?.uid?.let {
-                        retrieveUserData(it)
-                    }
-                } else {
-                    handleException(task.exception, customMessage = "Login failed.")
-                }
-            }
-            .addOnFailureListener {
-                handleException(it, customMessage = "Login failed.")
-            }
-    }
-
-    fun onSignup(username: String, email: String, password: String) {
+    fun signup(username: String, email: String, password: String) {
         if (username.isEmpty() or email.isEmpty() or password.isEmpty()) {
             handleException(customMessage = "Please fill in all fields!")
             return
@@ -83,7 +57,7 @@ class TinderViewModel @Inject constructor(
     }
 
     private fun signupUser(email: String, password: String, username: String) {
-        getUserByUsername(username)
+        fireStore.getUserByUsername(username)
             .addOnSuccessListener { snapshot ->
                 if (snapshot.isEmpty) {
                     createAccount(
@@ -114,49 +88,6 @@ class TinderViewModel @Inject constructor(
                     handleException(task.exception, "Signup failed")
                 }
             }
-    }
-
-    private fun retrieveUserData(uid: String) {
-        showLoading()
-        getFirebaseUserById(uid)
-            .addSnapshotListener { value, error ->
-                if (error != null) {
-                    handleException(error, "Cannot retrieve user data.")
-                }
-
-                if (value != null) {
-                    println(value.data)
-                    val user = value.toObject<FirebaseUserData>()
-                    _userData.value = user
-                    hideLoading()
-                }
-            }
-    }
-
-    fun onLogout() {
-        auth.logout()
-        _signedIn.value = false
-        _userData.value = null
-        _popupNotification.value = Event("Logged out.")
-    }
-
-    private fun getFirebaseUserById(uid: String): DocumentReference {
-        return fireStore.collection(COLLECTION_USER)
-            .document(uid)
-    }
-
-    private fun getUserByUsername(username: String): Task<QuerySnapshot> {
-        return fireStore.collection(COLLECTION_USER)
-            .whereEqualTo("username", username)
-            .get()
-    }
-
-    private fun showLoading() {
-        _loading.value = true
-    }
-
-    private fun hideLoading() {
-        _loading.value = false
     }
 
     private fun createOrUpdateProfile(
@@ -207,6 +138,31 @@ class TinderViewModel @Inject constructor(
         }
     }
 
+    private fun retrieveUserData(uid: String) {
+        showLoading()
+        fireStore.getFirebaseUserById(uid)
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    handleException(error, "Cannot retrieve user data.")
+                }
+
+                if (value != null) {
+                    println(value.data)
+                    val user = value.toObject<FirebaseUserData>()
+                    _userData.value = user
+                    hideLoading()
+                }
+            }
+    }
+
+    private fun showLoading() {
+        _loading.value = true
+    }
+
+    private fun hideLoading() {
+        _loading.value = false
+    }
+
     private fun handleException(
         exception: java.lang.Exception? = null,
         customMessage: String = ""
@@ -218,4 +174,5 @@ class TinderViewModel @Inject constructor(
         _popupNotification.value = Event(message)
         hideLoading()
     }
+
 }

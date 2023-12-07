@@ -65,8 +65,8 @@ fun SwipeCards(navController: NavController) {
             .background(
                 Brush.verticalGradient(
                     listOf(
-                        Color(0xfff68084),
-                        Color(0xffa6c0fe)
+                        Color(0xffff0000),
+                        Color(0xff000000)
                     )
                 )
             )
@@ -87,7 +87,8 @@ fun SwipeCards(navController: NavController) {
                     .padding(24.dp)
                     .fillMaxSize()
                     .aspectRatio(1f)
-                    .align(Alignment.Center)) {
+                    .align(Alignment.Center)
+            ) {
                 states.forEach { (matchProfile, state) ->
                     if (state.swipedDirection == null) {
                         ProfileCard(
@@ -171,8 +172,10 @@ private fun CircleButton(
             .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
         onClick = onClick
     ) {
-        Icon(icon, null,
-            tint = MaterialTheme.colorScheme.onPrimary)
+        Icon(
+            icon, null,
+            tint = MaterialTheme.colorScheme.onPrimary
+        )
     }
 }
 
@@ -183,17 +186,21 @@ private fun ProfileCard(
 ) {
     Card(modifier) {
         Box {
-            Image(contentScale = ContentScale.Crop,
+            Image(
+                contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize(),
                 painter = painterResource(matchProfile.drawableResId),
-                contentDescription = null)
+                contentDescription = null
+            )
             Scrim(Modifier.align(Alignment.BottomCenter))
             Column(Modifier.align(Alignment.BottomStart)) {
-                Text(text = matchProfile.name,
+                Text(
+                    text = matchProfile.name,
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(10.dp))
+                    modifier = Modifier.padding(10.dp)
+                )
             }
         }
     }
@@ -242,12 +249,12 @@ private fun stringFrom(direction: Direction): String {
     }
 }
 
-
 @Composable
 fun Scrim(modifier: Modifier = Modifier) {
     Box(
         modifier
             .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black)))
             .height(180.dp)
-            .fillMaxWidth())
+            .fillMaxWidth()
+    )
 }

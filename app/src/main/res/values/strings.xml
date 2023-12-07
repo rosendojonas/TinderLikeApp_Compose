@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">Tinder</string>
+    <string name="saving_profile_message">Saving profile</string>
+    <string name="profile_saved_message">Profile saved</string>
+    <string name="back">Back</string>
+    <string name="save">Save</string>
+    <string name="name">Name</string>
+    <string name="username">Username</string>
+    <string name="bio">Bio</string>
+    <string name="i_am_a">I am a:</string>
+    <string name="man">Man</string>
+    <string name="woman">Woman</string>
+    <string name="looking_for">Looking for:</string>
+    <string name="men">Men</string>
+    <string name="women">Women</string>
+    <string name="both">Both</string>
+    <string name="logout">Logout</string>
+    <string name="male">MALE</string>
+    <string name="female">FEMALE</string>
 </resources>

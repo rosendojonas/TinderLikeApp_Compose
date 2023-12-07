@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jonasrosendo.tinder.R
 import com.jonasrosendo.tinder.navigation.RouteNavigation
+import com.jonasrosendo.tinder.navigation.navigateTo
 
 enum class BottomNavigationItem(val icon: Int, val route: RouteNavigation) {
     SWIPE(R.drawable.baseline_swipe, RouteNavigation.Swipe),
@@ -42,6 +43,13 @@ fun BottomNavigationMenu(selectedItem: BottomNavigationItem, navController: NavC
                     .padding(4.dp)
                     .weight(1f)
                     .clickable {
+                        when (item) {
+                            BottomNavigationItem.SWIPE -> {}
+                            BottomNavigationItem.CHAT_LIST -> {}
+                            BottomNavigationItem.PROFILE -> {
+                                navController.navigateTo(RouteNavigation.Profile.route)
+                            }
+                        }
                     },
                 colorFilter = if (item == selectedItem) ColorFilter.tint(Color.Black) else ColorFilter.tint(
                     Color.Gray

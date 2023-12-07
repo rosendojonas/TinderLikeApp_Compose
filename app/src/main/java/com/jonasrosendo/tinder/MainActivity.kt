@@ -17,12 +17,12 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.jonasrosendo.tinder.navigation.RouteNavigation
+import com.jonasrosendo.tinder.ui.features.login.LoginScreen
+import com.jonasrosendo.tinder.ui.features.profile.ProfileScreen
+import com.jonasrosendo.tinder.ui.features.signup.SignupScreen
+import com.jonasrosendo.tinder.ui.features.splash.SplashScreen
 import com.jonasrosendo.tinder.ui.screens.ChatListScreen
-import com.jonasrosendo.tinder.ui.screens.LoginScreen
-import com.jonasrosendo.tinder.ui.screens.ProfileScreen
-import com.jonasrosendo.tinder.ui.screens.SignupScreen
 import com.jonasrosendo.tinder.ui.screens.SingleChatScreen
-import com.jonasrosendo.tinder.ui.screens.SplashScreen
 import com.jonasrosendo.tinder.ui.screens.SwipeCards
 import com.jonasrosendo.tinder.ui.theme.TinderTheme
 import com.jonasrosendo.tinder.utils.NotificationMessage
@@ -65,28 +65,28 @@ fun NavigationGraph(
 ) {
     val startRoute =
         if (currentUser != null)
-            RouteNavigation.Profile.route
+            RouteNavigation.Swipe.route
         else
-            RouteNavigation.Splash.route
+            RouteNavigation.Login.route
 
     NavHost(navController = navController, startDestination = startRoute) {
         composable(RouteNavigation.Splash.route) {
             SplashScreen(viewModel = viewModel, navController = navController)
         }
         composable(RouteNavigation.Signup.route) {
-            SignupScreen(navController, viewModel)
+            SignupScreen(navController)
         }
         composable(RouteNavigation.Swipe.route) {
             SwipeCards(navController)
         }
         composable(RouteNavigation.Login.route) {
-            LoginScreen(viewModel, navController)
+            LoginScreen(navController)
         }
         composable(RouteNavigation.ChatList.route) {
             ChatListScreen(navController)
         }
         composable(RouteNavigation.Profile.route) {
-            ProfileScreen(viewModel, navController)
+            ProfileScreen(navController)
         }
         composable(RouteNavigation.SingleChat.route) {
             SingleChatScreen(chatId = "123", navController = navController)
