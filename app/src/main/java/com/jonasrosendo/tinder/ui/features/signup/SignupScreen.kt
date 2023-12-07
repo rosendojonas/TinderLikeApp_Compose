@@ -116,10 +116,12 @@ fun SignupScreen(navController: NavController) {
             AuthenticationButton(
                 label = "SIGN UP"
             ) {
-                viewModel.signup(
-                    usernameState.value.text.trim(),
-                    emailState.value.text.trim(),
-                    passwordState.value.text.trim()
+                viewModel.applyAction(
+                    SignupViewAction.Signup(
+                        usernameState.value.text.trim(),
+                        emailState.value.text.trim(),
+                        passwordState.value.text.trim()
+                    )
                 )
             }
 

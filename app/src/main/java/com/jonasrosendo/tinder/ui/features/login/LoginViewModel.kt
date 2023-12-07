@@ -43,7 +43,7 @@ class LoginViewModel @Inject constructor(
     private val _userData = MutableStateFlow<FirebaseUserData?>(null)
     val userData: StateFlow<FirebaseUserData?> = _userData
 
-    fun login(email: String, password: String) {
+    private fun login(email: String, password: String) {
         if (email.isEmpty() or password.isEmpty()) {
             handleException(customMessage = "Please fill in all fields!")
             return

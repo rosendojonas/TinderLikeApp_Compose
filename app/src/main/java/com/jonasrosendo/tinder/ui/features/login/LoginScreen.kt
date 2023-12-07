@@ -175,9 +175,11 @@ fun DefaultState(
             AuthenticationButton(
                 label = stringResource(R.string.login).uppercase()
             ) {
-                viewModel.login(
-                    email.trim(),
-                    password.trim()
+                viewModel.applyAction(
+                    LoginViewAction.Login(
+                        email.trim(),
+                        password.trim()
+                    )
                 )
             }
 

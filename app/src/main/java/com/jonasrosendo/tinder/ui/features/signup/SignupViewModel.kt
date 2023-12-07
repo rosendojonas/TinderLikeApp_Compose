@@ -45,7 +45,7 @@ class SignupViewModel @Inject constructor(
         }
     }
 
-    fun signup(username: String, email: String, password: String) {
+    private fun signup(username: String, email: String, password: String) {
         if (username.isEmpty() or email.isEmpty() or password.isEmpty()) {
             handleException(customMessage = "Please fill in all fields!")
             return
