@@ -1,4 +1,4 @@
-package com.jonasrosendo.tinder.ui.screens
+package com.jonasrosendo.tinder.ui.features.swipe
 
 import android.util.Log
 import androidx.compose.foundation.Image

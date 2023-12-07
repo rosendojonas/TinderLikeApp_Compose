@@ -23,7 +23,7 @@ import com.jonasrosendo.tinder.ui.features.signup.SignupScreen
 import com.jonasrosendo.tinder.ui.features.splash.SplashScreen
 import com.jonasrosendo.tinder.ui.screens.ChatListScreen
 import com.jonasrosendo.tinder.ui.screens.SingleChatScreen
-import com.jonasrosendo.tinder.ui.screens.SwipeCards
+import com.jonasrosendo.tinder.ui.features.swipe.SwipeCards
 import com.jonasrosendo.tinder.ui.theme.TinderTheme
 import com.jonasrosendo.tinder.utils.NotificationMessage
 import dagger.hilt.android.AndroidEntryPoint
