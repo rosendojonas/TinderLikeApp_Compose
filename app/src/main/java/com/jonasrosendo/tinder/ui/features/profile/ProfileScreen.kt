@@ -406,7 +406,7 @@ fun ProfileImage(
                 CommonImage(data = imageUri)
             }
 
-            Text(text = "Change profile picture")
+            Text(text = stringResource(R.string.change_profile_picture))
         }
 
         val isLoading = false
