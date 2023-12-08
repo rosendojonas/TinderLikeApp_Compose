@@ -89,16 +89,12 @@ fun ProfileScreen(navController: NavController) {
             nameState.value = userData.value?.name ?: ""
             usernameState.value = userData.value?.username ?: ""
             bioState.value = userData.value?.bio ?: ""
-            genderState.value =
-                Gender.valueOf(
-                    if (userData.value == null) stringResource(R.string.male)
-                    else userData.value!!.gender.toString().uppercase()
-                )
-            genderPreferenceState.value =
-                Gender.valueOf(
-                    if (userData.value == null) stringResource(R.string.female)
-                    else userData.value!!.genderPreference.toString().uppercase()
-                )
+            val gender =
+                if (userData.value?.gender == null) stringResource(R.string.male) else userData.value!!.gender.toString()
+            genderState.value = Gender.valueOf(gender)
+            val genderPreference =
+                if (userData.value?.gender == null) stringResource(R.string.female) else userData.value!!.genderPreference.toString()
+            genderPreferenceState.value = Gender.valueOf(genderPreference)
 
             Column {
                 ProfileContent(

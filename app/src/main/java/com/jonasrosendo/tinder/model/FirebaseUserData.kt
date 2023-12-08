@@ -7,7 +7,10 @@ data class FirebaseUserData(
     val imageUrl: String? = "",
     val bio: String? = "",
     val gender: String? = "",
-    val genderPreference: String? = ""
+    val genderPreference: String? = "",
+    var swipesLeft: List<String> = listOf(),
+    var swipesRight: List<String> = listOf(),
+    var matches: List<String> = listOf()
 ) {
     fun toMap() = mapOf(
         "userId" to userId,
@@ -16,6 +19,9 @@ data class FirebaseUserData(
         "imageUrl" to imageUrl,
         "bio" to bio,
         "gender" to gender,
-        "genderPreference" to genderPreference
+        "genderPreference" to genderPreference,
+        "swipesLeft" to swipesLeft,
+        "swipesRight" to swipesRight,
+        "matches" to matches
     )
 }
